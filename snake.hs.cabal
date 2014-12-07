@@ -18,4 +18,5 @@ cabal-version:       >=1.8
 executable snake.hs
   main-is:         src/snake.hs
   -- other-modules:
-  build-depends:       base ==4.6.*
+  build-depends:   ncurses,
+                   base ==4.6.*

@@ -1,10 +1,23 @@
--- Copyright (c) 2006 Don Stewart - http://www.cse.unsw.edu.au/~dons/
--- GPL version 2 or later (see http://www.gnu.org/copyleft/gpl.html)
---
-  import System.Environment
+import UI.NCurses
 
-  -- | 'main' runs the main program
-  main :: IO ()
-  main = getArgs >>= print . haqify . head
+main :: IO()
 
-  haqify s = "Haq! " ++ s
+main = runCurses $ do
+  setEcho False
+  w <- defaultWindow
+  updateWindow w $ do
+    moveCursor 1 10
+    drawString "Hello world!"
+    moveCursor 3 10
+    drawString "(press q to quit)"
+    moveCursor 0 0
+  render
+  waitFor w (\ev -> ev == EventCharacter 'q' || ev == EventCharacter 'Q')
+
+waitFor :: Window -> (Event -> Bool) -> Curses ()
+waitFor w p = loop where
+  loop = do
+    ev <- getEvent w Nothing
+    case ev of
+      Nothing -> loop
+      Just ev' -> if p ev' then return () else loop
