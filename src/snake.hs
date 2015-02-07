@@ -1,23 +1,31 @@
 import UI.NCurses
 
-main :: IO()
+data Snake = Snake { size :: Int }
 
+main :: IO()
 main = runCurses $ do
   setEcho False
-  w <- defaultWindow
-  updateWindow w $ do
-    moveCursor 1 10
-    drawString "Hello world!"
-    moveCursor 3 10
-    drawString "(press q to quit)"
-    moveCursor 0 0
-  render
-  waitFor w (\ev -> ev == EventCharacter 'q' || ev == EventCharacter 'Q')
+  win <- defaultWindow
 
-waitFor :: Window -> (Event -> Bool) -> Curses ()
-waitFor w p = loop where
+  let snake = Snake 3
+  drawSnake win snake
+
+  updateWindow win $ do
+    drawBorder Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+  render
+  readInput win (\e -> e == EventCharacter 'q')
+
+readInput :: Window -> (Event -> Bool) -> Curses ()
+readInput win f = loop where
   loop = do
-    ev <- getEvent w Nothing
-    case ev of
+    event <- getEvent win Nothing
+    case event of
       Nothing -> loop
-      Just ev' -> if p ev' then return () else loop
+      Just e' -> if f e' then return () else loop
+
+drawSnake :: Window -> Snake -> Curses ()
+drawSnake win snake =
+  updateWindow win $ do
+    moveCursor 4 4
+    drawString "A"
